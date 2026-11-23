@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
@@ -8,13 +7,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class IsLogin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
+        if (!session()->has('admin_id')) {
+            return redirect('/login')->with('error', 'Silakan login terlebih dahulu');
+        }
+
         return $next($request);
     }
 }
