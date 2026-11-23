@@ -1,59 +1,154 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Apps-Student
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi latihan praktikum **Framework Laravel** untuk mengelola data **student** dan **admin**. Halaman CRUD Student hanya bisa diakses setelah login sebagai admin, dengan autentikasi berbasis session dan middleware. Dibuat dengan Laravel 12, PHP 8.2, dan MySQL (XAMPP).
 
-## About Laravel
+**Disusun oleh:** Vito Ade Chrisnanta / 2513020056
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Migration** untuk tabel `students` dan `admins`.
+- **Model dan Controller** untuk Student, serta Model untuk Admin dan `AuthController` untuk login.
+- **Factory dan Seeder** untuk mengisi data dummy (lebih dari 5 data per tabel).
+- **Autentikasi (hal 33):** login, logout, dan restrict pages berdasarkan data pada tabel `admins`.
+- **CRUD Student:** tambah, lihat, ubah, dan hapus data student, dengan validasi dan pesan notifikasi.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Teknologi
 
-## Learning Laravel
+- Laravel 12 dan PHP 8.2
+- MySQL (XAMPP) dan phpMyAdmin
+- Bootstrap 5 (dimuat dari CDN)
+- Blade Template
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Kebutuhan
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.2 atau lebih baru (XAMPP)
+- Composer
+- MySQL dan phpMyAdmin (XAMPP)
+- Koneksi internet (Bootstrap dimuat dari CDN)
 
-## Laravel Sponsors
+## Cara Menjalankan
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Masuk ke folder proyek dan pasang dependensi:
 
-### Premium Partners
+```
+cd Apps-Student
+composer install
+copy .env.example .env
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Di Linux atau macOS, ganti `copy` dengan `cp`.
 
-## Contributing
+2. Nyalakan **Apache** dan **MySQL** di XAMPP, lalu buat database kosong bernama `apps_student` di phpMyAdmin.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. Ubah pengaturan database di file `.env`:
 
-## Code of Conduct
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=apps_student
+DB_USERNAME=root
+DB_PASSWORD=
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+SESSION_DRIVER=file
+CACHE_STORE=file
+```
 
-## Security Vulnerabilities
+4. Buat tabel, isi data dummy, dan jalankan server:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+php artisan migrate:fresh --seed
+php artisan serve
+```
 
-## License
+5. Buka `http://127.0.0.1:8000` di browser. Pengunjung yang belum login akan diarahkan ke halaman login.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Akun Uji
+
+| Username | Password |
+|---|---|
+| `admin` | `admin123` |
+
+Lima admin lain dibuat acak oleh Factory dengan password `password`.
+
+## Alur Autentikasi
+
+1. Admin mengisi username dan password di halaman `/login`.
+2. `AuthController` mencari admin pada tabel `admins`, lalu mencocokkan password dengan `Hash::check`.
+3. Jika cocok, `admin_id` dan `admin_username` disimpan di session, lalu admin diarahkan ke `/students`.
+4. Middleware `IsLogin` (alias `islogin`) memeriksa session pada setiap halaman Student. Jika belum login, pengunjung dialihkan ke `/login`.
+5. Logout menghapus session dan mengarahkan kembali ke `/login`.
+
+Contoh: membuka `/students` langsung tanpa login akan menampilkan halaman login, bukan data student.
+
+## Daftar URL
+
+| Method | URL | Keterangan | Login |
+|---|---|---|---|
+| GET | `/` | Diarahkan ke `/students` | Ya |
+| GET | `/login` | Halaman login | Tidak |
+| POST | `/login` | Proses login | Tidak |
+| POST | `/logout` | Logout | Tidak |
+| GET | `/students` | Daftar student | Ya |
+| GET | `/students/create` | Form tambah student | Ya |
+| POST | `/students` | Simpan student baru | Ya |
+| GET | `/students/{id}/edit` | Form ubah student | Ya |
+| PUT | `/students/{id}` | Simpan perubahan student | Ya |
+| DELETE | `/students/{id}` | Hapus student | Ya |
+
+## Struktur Tabel
+
+Tabel `students`:
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| `id` | bigint, auto increment | Primary key |
+| `nim` | varchar(20) | Unik |
+| `nama` | varchar(100) | Nama student |
+| `jurusan` | varchar(100) | Jurusan |
+| `alamat` | varchar(255) | Alamat |
+| `created_at`, `updated_at` | timestamp | Waktu dibuat dan diubah |
+
+Tabel `admins`:
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| `id` | bigint, auto increment | Primary key |
+| `username` | varchar(100) | Unik |
+| `password` | varchar(255) | Password (hash bcrypt) |
+| `created_at`, `updated_at` | timestamp | Waktu dibuat dan diubah |
+
+## Data Dummy (Seeder dan Factory)
+
+- 1 admin tetap (`admin` / `admin123`) dan 5 admin acak dari `AdminFactory`.
+- 10 student acak dari `StudentFactory` (NIM, nama, jurusan, dan alamat dibuat dengan Faker).
+
+## File Penting
+
+```
+app/
+  Http/Controllers/
+    AuthController.php         # login dan logout
+    StudentController.php      # CRUD student
+  Http/Middleware/IsLogin.php  # pembatas halaman
+  Models/
+    Student.php
+    Admin.php
+bootstrap/app.php              # alias middleware islogin
+database/
+  migrations/                  # students dan admins
+  factories/                   # StudentFactory, AdminFactory
+  seeders/DatabaseSeeder.php
+resources/views/
+  layouts/app.blade.php
+  auth/login.blade.php
+  students/                    # index, create, edit, _form
+routes/web.php
+```
+
+## Catatan
+
+- File `.env` tidak ikut repository, jadi harus dibuat dari `.env.example`.
+- Password disimpan dalam bentuk hash (bcrypt), bukan teks biasa.
+- Perintah `migrate:fresh` menghapus semua tabel di database `apps_student`, lalu membuatnya ulang.
