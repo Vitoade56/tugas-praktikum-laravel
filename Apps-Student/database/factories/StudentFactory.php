@@ -2,23 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Student>
- */
 class StudentFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            'nim' => fake()->unique()->numerify('2026########'),
+            'nama' => fake()->name(),
+            'jurusan' => fake()->randomElement(['Sistem Informasi', 'Teknik Informatika', 'Manajemen', 'Akuntansi']),
+            'alamat' => fake()->address(),
         ];
     }
 }
